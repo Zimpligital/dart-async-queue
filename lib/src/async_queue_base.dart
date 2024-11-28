@@ -225,7 +225,7 @@ class AsyncQueue extends AsyncQueueInterface {
     }
     _size++;
 
-    _emitEvent(QueueEventType.newJobAdded, _first!.label);
+    _emitEvent(QueueEventType.newJobAdded, node.label);
   }
 
   /// remove node, execute job

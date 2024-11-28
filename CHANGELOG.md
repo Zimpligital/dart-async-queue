@@ -1,3 +1,7 @@
+## 2.0.2
+
+- fix wrong job label on `QueueEventType.newJobAdded`
+
 ## 2.0.1
 
 - fix issue that queue listener return wrong job label
