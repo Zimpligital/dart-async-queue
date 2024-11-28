@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:async_queue/src/async_queue_base.dart';
 import 'package:async_queue/src/exceptions.dart';
 import 'package:async_queue/src/queue_event.dart';
@@ -123,6 +125,39 @@ void main() {
     );
 
     q.addJob((_) => Future.delayed(const Duration(milliseconds: 300)));
+
+    await q.start();
+
+    expect(q.size, 0);
+  });
+  test('job should return correct job label', () async {
+    final q = AsyncQueue();
+    q.addQueueListener(
+      (event) {
+        print("JOBLABEL ${event.type} - ${event.jobLabel} ");
+      },
+    );
+
+    q.addJob(
+      label: 'job1',
+      (_) => Future.delayed(const Duration(milliseconds: 200), () {
+        print("run job1");
+      }),
+    );
+
+    q.addJob(
+      label: 'job2',
+      (_) => Future.delayed(const Duration(milliseconds: 300), () {
+        print("run job2");
+      }),
+    );
+
+    q.addJob(
+      label: 'job3',
+      (_) => Future.delayed(const Duration(milliseconds: 300), () {
+        print("run job3");
+      }),
+    );
 
     await q.start();
 

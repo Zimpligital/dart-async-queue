@@ -1,3 +1,7 @@
+## 2.0.1
+
+- fix issue that queue listener return wrong job label
+
 ## 2.0.0
 
 - add Flutter example

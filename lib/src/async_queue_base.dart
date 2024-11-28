@@ -261,9 +261,9 @@ class AsyncQueue extends AsyncQueueInterface {
         _map.remove(jobLabel);
       }
       _size--;
-      _emitEvent(QueueEventType.afterJob, jobLabel);
+      _emitEvent(QueueEventType.afterJob, currentNode.label);
     } else {
-      _emitEvent(QueueEventType.retryJob, jobLabel);
+      _emitEvent(QueueEventType.retryJob, currentNode.label);
     }
     _currentJobUpdater?.call(null);
   }
