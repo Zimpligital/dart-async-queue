@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:async_queue/src/async_queue_base.dart';
 import 'package:async_queue/src/exceptions.dart';
 import 'package:async_queue/src/queue_event.dart';
@@ -8,16 +10,16 @@ void main() {
     final q = AsyncQueue();
     List<int> res = [];
 
-    q.addJob(() =>
+    q.addJob((_) =>
         Future.delayed(const Duration(milliseconds: 100), () => res.add(1)));
 
-    q.addJob(() =>
+    q.addJob((_) =>
         Future.delayed(const Duration(milliseconds: 400), () => res.add(2)));
 
-    q.addJob(() =>
+    q.addJob((_) =>
         Future.delayed(const Duration(milliseconds: 300), () => res.add(3)));
 
-    q.addJob(() =>
+    q.addJob((_) =>
         Future.delayed(const Duration(milliseconds: 200), () => res.add(4)));
 
     await q.start();
@@ -28,10 +30,10 @@ void main() {
   test('queue should be empty after execution', () async {
     final q = AsyncQueue();
 
-    q.addJob(() async {});
-    q.addJob(() async {});
-    q.addJob(() async {});
-    q.addJob(() async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
 
     expect(q.size, 4);
 
@@ -43,15 +45,15 @@ void main() {
   test('job should not be added if queue is closed', () {
     final q = AsyncQueue();
 
-    q.addJob(() async {});
-    q.addJob(() async {});
-    q.addJob(() async {});
-    q.addJob(() async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
 
     q.close();
 
-    q.addJob(() async {});
-    q.addJob(() async {});
+    q.addJob((_) async {});
+    q.addJob((_) async {});
 
     expect(q.size, 4);
   });
@@ -59,12 +61,12 @@ void main() {
   test('adding job to closed queue should throw Error', () {
     final q = AsyncQueue();
 
-    q.addJobThrow(() async {});
+    q.addJobThrow((_) async {});
 
     q.close();
 
     expect(
-      () => q.addJobThrow(() async {}),
+      () => q.addJobThrow((_) async {}),
       throwsA(isA<ClosedQueueException>()),
     );
 
@@ -77,7 +79,7 @@ void main() {
 
     q.addQueueListener(events.add);
 
-    q.addJob(() async {});
+    q.addJob((_) async {});
     expect(events.last.type, QueueEventType.newJobAdded);
 
     q.close();
@@ -99,10 +101,10 @@ void main() {
   test('queue should stop executing ', () async {
     final q = AsyncQueue();
 
-    q.addJob(() => Future.delayed(const Duration(milliseconds: 100)));
-    q.addJob(() => Future.delayed(const Duration(milliseconds: 400)));
-    q.addJob(() => Future.delayed(const Duration(milliseconds: 300)));
-    q.addJob(() => Future.delayed(const Duration(milliseconds: 200)));
+    q.addJob((_) => Future.delayed(const Duration(milliseconds: 100)));
+    q.addJob((_) => Future.delayed(const Duration(milliseconds: 400)));
+    q.addJob((_) => Future.delayed(const Duration(milliseconds: 300)));
+    q.addJob((_) => Future.delayed(const Duration(milliseconds: 200)));
 
     expect(q.size, 4);
 
@@ -117,12 +119,45 @@ void main() {
     final q = AsyncQueue();
 
     q.addJob(
-      () => Future.delayed(const Duration(milliseconds: 200), () {
+      (_) => Future.delayed(const Duration(milliseconds: 200), () {
         q.stop();
       }),
     );
 
-    q.addJob(() => Future.delayed(const Duration(milliseconds: 300)));
+    q.addJob((_) => Future.delayed(const Duration(milliseconds: 300)));
+
+    await q.start();
+
+    expect(q.size, 0);
+  });
+  test('job should return correct job label', () async {
+    final q = AsyncQueue();
+    q.addQueueListener(
+      (event) {
+        print("JOBLABEL ${event.type} - ${event.jobLabel} ");
+      },
+    );
+
+    q.addJob(
+      label: 'job1',
+      (_) => Future.delayed(const Duration(milliseconds: 200), () {
+        print("run job1");
+      }),
+    );
+
+    q.addJob(
+      label: 'job2',
+      (_) => Future.delayed(const Duration(milliseconds: 300), () {
+        print("run job2");
+      }),
+    );
+
+    q.addJob(
+      label: 'job3',
+      (_) => Future.delayed(const Duration(milliseconds: 300), () {
+        print("run job3");
+      }),
+    );
 
     await q.start();
 
