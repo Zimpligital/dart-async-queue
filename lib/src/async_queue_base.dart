@@ -173,6 +173,13 @@ class AsyncQueue extends AsyncQueueInterface {
     _emitEvent(QueueEventType.queueEnd);
   }
 
+  /// to start the execution of jobs in queue with auto run
+  @override
+  Future<void> startWithAutoRun() async {
+    _autoRun = true;
+    await start();
+  }
+
   /// to add node into queue
   void _enqueue(AsyncNode node) {
     if (_first == null) {

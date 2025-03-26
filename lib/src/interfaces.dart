@@ -9,6 +9,7 @@ abstract class AsyncQueueInterface {
   void addJob(AsyncJob job, {String? label, int retryTime});
   void addJobThrow(AsyncJob job);
   Future<void> start();
+  Future<void> startWithAutoRun();
   List<JobInfo> list();
   JobInfo getJobInfo(String label);
 }
