@@ -40,7 +40,12 @@ class AsyncNode {
 
   dynamic run(PreviousResult previousResult) async {
     state = JobState.running;
-    return await _job(previousResult);
+
+    try {
+      return await _job(previousResult);
+    } catch (e) {
+      state = JobState.failed;
+    }
   }
 
   @override
